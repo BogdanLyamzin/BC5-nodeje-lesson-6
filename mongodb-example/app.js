@@ -5,74 +5,40 @@ const cors = require("cors");
 // dotenv.config();
 require("dotenv").config();
 
+const routes = require("./api");
+
 const app = express();
 
 app.use(cors());
 
-app.use((req, res)=>{
+app.use("/api/v1/authors", routes.authors);
+// app.use("/api/v1/posts", routes.posts);
 
+app.use((req, res)=> {
+    res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "Not found"
+    })
 });
 
-const {Schema, model} = mongoose;
-
-const userSchema = Schema({
-    name: String,
-    lastName: String,
-    birthday: {
-        type: String,
-        required: true,
-        minlength: 10,
-        maxlength: 10
-    }
+app.use((error, _, res, __)=>{
+    const {code = 500, message = "Server error"} = error;
+    res.status(code).json({
+        status: "fail",
+        code,
+        message
+    })
 });
-
-const User = model("user", userSchema);
 
 const {DB_HOST, PORT} = process.env;
 
-const newAuthor = {
-    name: "Скотт",
-    lastName: "Бэккер",
-    birthday: "04.06.1970"
-}
 
 mongoose.connect(DB_HOST, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
 }).then(()=> {
-    User.create(newAuthor, (error, data)=> {
-        console.log(error);
-        console.log(data)
-    });
-
     const port = PORT || 3000;
     app.listen(port);
-    console.log("Database connect success");
 })
-
-/*
-mongoose.connect(DB_HOST, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-}).then(async ()=> {
-    try {
-        const result = await User.create(newAuthor);
-        res.status(201).json({
-            status: "success",
-            code: 201,
-            data: {
-                result
-            }
-        })
-    }
-    catch (error){
-        next(error);
-    }
-    
-    const port = PORT || 3000;
-    app.listen(port);
-    console.log("Database connect success");
-})
-*/

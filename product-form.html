@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="update-product" action="">
+        <input type="text" placeholder="название товара" name="title" value="iPhone X">
+        <input type="text" placeholder="описание товара" name="decription" value="iPhone X">
+        <input type="text" placeholder="цена" name="price" value="34000">
+        <button>Обновить</button>
+    </form>
+    <script>
+        const form = document.getElementById("update-product")
+        form.addEventListener("submit", function(e){
+            e.preventDefault();
+            const updateProduct = {
+                title: this.querySelector("[name=title]").value,
+                decription: this.querySelector("[name=decription]").value,
+                price: this.querySelector("[name=price]").value,
+            }
+            fetch("/products", {
+                method: "PUT",
+                body: JSON.stringify(updateProduct)
+            })
+        })
+        
+    </script>
+</body>
+</html>
